@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 AI創作スタジオ | AI Creator Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 6px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            color: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Content Areas */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Voice Recording */
+        .voice-section {
+            text-align: center;
+        }
+
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(255,107,107,0.4);
+        }
+
+        .mic-button.recording {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(45deg, #ff4757, #ff3742);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 8px 25px rgba(255,107,107,0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255,107,107,0.6); }
+            100% { transform: scale(1); box-shadow: 0 8px 25px rgba(255,107,107,0.3); }
+        }
+
+        .voice-status {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .wave-animation {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            margin: 10px 0;
+        }
+
+        .wave-bar {
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 2px;
+            animation: wave 1.5s infinite ease-in-out;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 40%, 100% { transform: scaleY(0.4); }
+            20% { transform: scaleY(1); }
+        }
+
+        /* Business Ideas */
+        .business-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .business-input:focus {
+            border-color: #667eea;
+        }
+
+        .sample-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sample-btn {
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sample-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Business Idea Card */
+        .idea-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .idea-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .idea-detail {
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .idea-detail:last-child {
+            border-bottom: none;
+        }
+
+        .idea-detail strong {
+            display: inline-block;
+            width: 80px;
+            font-size: 0.9rem;
+        }
+
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .gallery-item-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #666;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Image Result */
+        .image-result {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .image-result img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+        }
+
+        .sparkle-effect {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sparkle {
+            position: absolute;
+            color: #ffd700;
+            font-size: 1.5rem;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .container { padding: 15px; }
+            .header h1 { font-size: 1.8rem; }
+            .mic-button { width: 100px; height: 100px; font-size: 2rem; }
+            .tab-btn { font-size: 0.8rem; padding: 10px 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎨 AI創作スタジオ</h1>
+            <p>声と言葉で、あなたのアイデアを形にしよう</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('voice')">🎤 音声で画像</button>
+            <button class="tab-btn" onclick="switchTab('business')">💡 ビジネス</button>
+            <button class="tab-btn" onclick="switchTab('gallery')">✨ ギャラリー</button>
+        </div>
+
+        <!-- Voice Content -->
+        <div id="voice-content" class="tab-content active">
+            <div class="voice-section">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">音声で画像をつくる</h2>
+                <button class="mic-button" onclick="toggleRecording()">🎤</button>
+                
+                <div class="wave-animation" id="waveAnimation">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+
+                <div class="voice-status" id="voiceStatus">マイクボタンを押して話してください</div>
+                
+                <!-- Test buttons for debugging -->
+                <div style="text-align: center; margin: 10px 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <button onclick="testImageGeneration('花')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            🌸 花
+                        </button>
+                        <button onclick="testImageGeneration('チャイ')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            🍵 チャイ
+                        </button>
+                        <button onclick="testImageGeneration('バイク修理')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            🔧 バイク修理
+                        </button>
+                        <button onclick="testImageGeneration('ブレスレット')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            📿 ブレスレット
+                        </button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button onclick="testImageGeneration('野菜')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            🥬 野菜
+                        </button>
+                        <button onclick="testImageGeneration('服')" style="padding: 6px 12px; background: #e9ecef; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            👕 服
+                        </button>
+                    </div>
+                </div>
+
+                <div class="loading" id="voiceLoading">
+                    <div class="loading-spinner"></div>
+                    <p>画像を生成中...</p>
+                </div>
+
+                <div class="image-result" id="imageResult">
+                    <div class="sparkle-effect">
+                        <img id="generatedImage" src="" alt="Generated Image">
+                        <div class="sparkle" style="top: 10%; left: 10%;">✨</div>
+                        <div class="sparkle" style="top: 20%; right: 15%;">⭐</div>
+                        <div class="sparkle" style="bottom: 15%; left: 20%;">💫</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetVoice()">もう一回</button>
+                        <button class="btn btn-primary" onclick="saveImage()">保存する</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Content -->
+        <div id="business-content" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ビジネスアイデアをもらう</h2>
+            <input type="text" id="businessInput" class="business-input" placeholder="何を売りたい？作りたい？">
+            
+            <div class="sample-buttons">
+                <button class="sample-btn" onclick="fillSample('チャイ')">チャイ</button>
+                <button class="sample-btn" onclick="fillSample('ブレスレット')">ブレスレット</button>
+                <button class="sample-btn" onclick="fillSample('バイク修理')">バイク修理</button>
+                <button class="sample-btn" onclick="fillSample('野菜')">野菜</button>
+                <button class="sample-btn" onclick="fillSample('服')">服</button>
+            </div>
+
+            <button class="generate-btn" onclick="generateBusinessIdea()">アイデアをもらう</button>
+
+            <div class="loading" id="businessLoading">
+                <div class="loading-spinner"></div>
+                <p>アイデアを考え中...</p>
+            </div>
+
+            <div class="idea-card" id="ideaCard">
+                <h3 id="ideaTitle"></h3>
+                <div class="idea-detail">
+                    <strong>価格:</strong> <span id="ideaPrice"></span>
+                </div>
+                <div class="idea-detail">
+                    <strong>場所:</strong> <span id="ideaLocation"></span>
+                </div>
+                <div class="idea-detail">
+                    <strong>特徴:</strong> <span id="ideaFeature"></span>
+                </div>
+                <div class="idea-detail">
+                    <strong>売り文句:</strong> <span id="ideaSlogan"></span>
+                </div>
+                <div class="action-buttons" style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="generateBusinessIdea()">別のアイデア</button>
+                    <button class="btn btn-primary" onclick="saveIdea()">保存する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Content -->
+        <div id="gallery-content" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">つくった作品を見る</h2>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be populated here -->
+            </div>
+            <div class="empty-state" id="emptyState">
+                <div class="emoji">🎨</div>
+                <p>まだ作品がないよ！</p>
+                <p>音声やビジネスタブで何か作ってみよう</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let recognition = null;
+        let isRecording = false;
+        let currentImageUrl = '';
+        let savedItems = JSON.parse(localStorage.getItem('aiStudioItems') || '[]');
+
+        // Business ideas database
+        const businessIdeas = {
+            'チャイ': {
+                title: 'チャイ屋さん',
+                price: '300-500円',
+                location: 'オフィス街、駅前、大学近く',
+                feature: 'スパイシーチャイ、オリジナルブレンド',
+                slogan: '朝の一杯で元気100倍'
+            },
+            'ブレスレット': {
+                title: 'ハンドメイドアクセサリー',
+                price: '1000-3000円',
+                location: 'オンライン、フリマ、イベント',
+                feature: 'オーダーメイド、名前入り可能',
+                slogan: 'あなただけの特別なデザイン'
+            },
+            'バイク修理': {
+                title: '移動バイク修理サービス',
+                price: '3000-15000円',
+                location: '出張修理、駅前',
+                feature: '緊急修理、出張サービス',
+                slogan: '早い！安い！丁寧！'
+            },
+            '野菜': {
+                title: '産地直送野菜販売',
+                price: '200-800円/kg',
+                location: '農家直売所、オンライン',
+                feature: '無農薬野菜、朝採れ新鮮',
+                slogan: '新鮮野菜で健康ライフ'
+            },
+            '服': {
+                title: 'セレクトショップ',
+                price: '2000-10000円',
+                location: 'オンライン、ポップアップ',
+                feature: 'トレンドアイテム、手頃価格',
+                slogan: 'あなたのスタイル、私たちの提案'
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSpeechRecognition();
+            loadGallery();
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById(tabName + '-content').classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+            
+            // Load gallery if gallery tab is selected
+            if (tabName === 'gallery') {
+                loadGallery();
+            }
+        }
+
+        // Speech Recognition
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ja-JP';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = function() {
+                    document.getElementById('voiceStatus').textContent = '聴いています... 話してください';
+                    document.getElementById('waveAnimation').style.display = 'flex';
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('voiceStatus').textContent = `あなたの言葉: ${transcript}`;
+                    generateImageFromText(transcript);
+                };
+
+                recognition.onerror = function(event) {
+                    document.getElementById('voiceStatus').textContent = 'もう一度試してください';
+                    resetRecording();
+                };
+
+                recognition.onend = function() {
+                    resetRecording();
+                };
+            }
+        }
+
+        function toggleRecording() {
+            if (!recognition) {
+                alert('お使いのブラウザは音声認識に対応していません');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+                isRecording = true;
+                document.querySelector('.mic-button').classList.add('recording');
+            }
+        }
+
+        function resetRecording() {
+            isRecording = false;
+            document.querySelector('.mic-button').classList.remove('recording');
+            document.getElementById('waveAnimation').style.display = 'none';
+        }
+
+        function generateImageFromText(text) {
+            document.getElementById('voiceLoading').style.display = 'block';
+            
+            // Extract keywords for image search (Japanese and English support)
+            const keywords = text.replace(/[^\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\w\s]/g, '').trim();
+            const englishKeywords = translateToEnglish(keywords);
+            
+            console.log('Original text:', text);
+            console.log('Cleaned keywords:', keywords);
+            console.log('English keywords:', englishKeywords);
+            
+            setTimeout(() => {
+                // Create a collection of curated images based on common keywords
+                const imageCollection = {
+                    // 自然・風景
+                    '花': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop',
+                    'flower': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop',
+                    '山': 'https://images.unsplash.com/photo-1464822759844-d150ad6b3173?w=800&h=600&fit=crop',
+                    'mountain': 'https://images.unsplash.com/photo-1464822759844-d150ad6b3173?w=800&h=600&fit=crop',
+                    '海': 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=600&fit=crop',
+                    'ocean': 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=600&fit=crop',
+                    '空': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                    'sky': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                    
+                    // 動物
+                    '猫': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&h=600&fit=crop',
+                    'cat': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&h=600&fit=crop',
+                    '犬': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=600&fit=crop',
+                    'dog': 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=600&fit=crop',
+                    '鳥': 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=800&h=600&fit=crop',
+                    'bird': 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=800&h=600&fit=crop',
+                    
+                    // 物・建物
+                    '木': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
+                    'tree': 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
+                    '家': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+                    'house': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+                    
+                    // 乗り物・交通
+                    '車': 'https://images.unsplash.com/photo-1494976982739-71293e5b5b18?w=800&h=600&fit=crop',
+                    'car': 'https://images.unsplash.com/photo-1494976982739-71293e5b5b18?w=800&h=600&fit=crop',
+                    'バイク': 'https://images.unsplash.com/photo-1558618047-3c8c9bfbcd4d?w=800&h=600&fit=crop',
+                    'motorcycle': 'https://images.unsplash.com/photo-1558618047-3c8c9bfbcd4d?w=800&h=600&fit=crop',
+                    'bike': 'https://images.unsplash.com/photo-1558618047-3c8c9bfbcd4d?w=800&h=600&fit=crop',
+                    '自転車': 'https://images.unsplash.com/photo-1544191696-15ae45c47a67?w=800&h=600&fit=crop',
+                    'bicycle': 'https://images.unsplash.com/photo-1544191696-15ae45c47a67?w=800&h=600&fit=crop',
+                    
+                    // 修理・メンテナンス
+                    '修理': 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&h=600&fit=crop',
+                    'repair': 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&h=600&fit=crop',
+                    '工具': 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&h=600&fit=crop',
+                    'tools': 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&h=600&fit=crop',
+                    'メンテナンス': 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&h=600&fit=crop',
+                    'maintenance': 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=800&h=600&fit=crop',
+                    
+                    // 飲み物・食べ物
+                    'チャイ': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    'chai': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    'tea': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    'お茶': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    'コーヒー': 'https://images.unsplash.com/photo-1497515114629-f71d768fd07c?w=800&h=600&fit=crop',
+                    'coffee': 'https://images.unsplash.com/photo-1497515114629-f71d768fd07c?w=800&h=600&fit=crop',
+                    '飲み物': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    'drink': 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop',
+                    
+                    // アクセサリー・装飾
+                    'ブレスレット': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=600&fit=crop',
+                    'bracelet': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=600&fit=crop',
+                    'アクセサリー': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=600&fit=crop',
+                    'jewelry': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=600&fit=crop',
+                    
+                    // 野菜・農業
+                    '野菜': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&h=600&fit=crop',
+                    'vegetables': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&h=600&fit=crop',
+                    '農業': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+                    'farming': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+                    '畑': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+                    'field': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+                    
+                    // 服・ファッション
+                    '服': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    'clothes': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    'ファッション': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    'fashion': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    
+                    // ビジネス・店舗
+                    '店': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    'shop': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    '仕事': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop',
+                    'work': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop',
+                    'ビジネス': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop',
+                    'business': 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop'
+                };
+                
+                // Default fallback images
+                const defaultImages = [
+                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // beautiful sky
+                    'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop', // flowers
+                    'https://images.unsplash.com/photo-1464822759844-d150ad6b3173?w=800&h=600&fit=crop', // mountain
+                    'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&h=600&fit=crop', // ocean
+                    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop'  // forest
+                ];
+                
+                // Try to find a matching image
+                let imageUrl = null;
+                const searchWords = [...keywords.split(' '), ...englishKeywords.split(' ')];
+                
+                for (const word of searchWords) {
+                    if (imageCollection[word.toLowerCase()]) {
+                        imageUrl = imageCollection[word.toLowerCase()];
+                        console.log('Found matching image for:', word);
+                        break;
+                    }
+                }
+                
+                // If no match found, use a random default
+                if (!imageUrl) {
+                    imageUrl = defaultImages[Math.floor(Math.random() * defaultImages.length)];
+                    console.log('Using random default image');
+                }
+                
+                currentImageUrl = imageUrl;
+                console.log('Final image URL:', imageUrl);
+                
+                const imgElement = document.getElementById('generatedImage');
+                
+                imgElement.onerror = function() {
+                    console.error('Image failed to load:', imageUrl);
+                    // Try a different default image
+                    const fallbackUrl = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+                    console.log('Trying fallback URL:', fallbackUrl);
+                    this.onerror = function() {
+                        // Show error message
+                        document.getElementById('voiceStatus').textContent = '画像の読み込みに失敗しました。ネットワーク接続を確認してください。';
+                        document.getElementById('voiceLoading').style.display = 'none';
+                        console.error('All image loading attempts failed');
+                    };
+                    this.src = fallbackUrl;
+                };
+                
+                imgElement.onload = function() {
+                    console.log('Image loaded successfully:', this.src);
+                    document.getElementById('voiceLoading').style.display = 'none';
+                    document.getElementById('imageResult').style.display = 'block';
+                };
+                
+                // Start loading the image
+                imgElement.src = imageUrl;
+                
+                // Add sparkle animation
+                setTimeout(() => {
+                    document.querySelectorAll('.sparkle').forEach((sparkle, index) => {
+                        setTimeout(() => {
+                            sparkle.style.animationDelay = `${index * 0.3}s`;
+                        }, index * 200);
+                    });
+                }, 100);
+            }, 3000);
+        }
+
+        function translateToEnglish(japaneseText) {
+            const translations = {
+                // 自然・風景
+                '花': 'flower',
+                '山': 'mountain',
+                '海': 'ocean',
+                '空': 'sky',
+                '木': 'tree',
+                '家': 'house',
+                '自然': 'nature',
+                '美しい': 'beautiful',
+                '風景': 'landscape',
+                '太陽': 'sun',
+                '月': 'moon',
+                '星': 'star',
+                '雨': 'rain',
+                '雪': 'snow',
+                '火': 'fire',
+                '水': 'water',
+                
+                // 動物
+                '猫': 'cat',
+                '犬': 'dog',
+                '鳥': 'bird',
+                
+                // 乗り物・交通
+                '車': 'car',
+                'バイク': 'motorcycle',
+                'オートバイ': 'motorcycle',
+                '自転車': 'bicycle',
+                
+                // 修理・仕事
+                '修理': 'repair',
+                '直す': 'repair',
+                '工具': 'tools',
+                'メンテナンス': 'maintenance',
+                '仕事': 'work',
+                'ビジネス': 'business',
+                '店': 'shop',
+                '商売': 'business',
+                
+                // 飲み物・食べ物
+                'チャイ': 'chai',
+                'お茶': 'tea',
+                '茶': 'tea',
+                'コーヒー': 'coffee',
+                '飲み物': 'drink',
+                '作る': 'making',
+                '作り方': 'making',
+                
+                // アクセサリー・装飾
+                'ブレスレット': 'bracelet',
+                'アクセサリー': 'jewelry',
+                '指輪': 'ring',
+                'ネックレス': 'necklace',
+                
+                // 野菜・農業
+                '野菜': 'vegetables',
+                '農業': 'farming',
+                '畑': 'field',
+                '栽培': 'farming',
+                
+                // 服・ファッション
+                '服': 'clothes',
+                'ファッション': 'fashion',
+                '洋服': 'clothes',
+                '衣類': 'clothes'
+            };
+            
+            const words = japaneseText.split(' ');
+            const englishWords = words.map(word => translations[word] || word).join(' ');
+            return englishWords || 'nature,beautiful,landscape';
+        }
+
+        function resetVoice() {
+            document.getElementById('imageResult').style.display = 'none';
+            document.getElementById('voiceStatus').textContent = 'マイクボタンを押して話してください';
+            currentImageUrl = '';
+        }
+
+        function saveImage() {
+            if (currentImageUrl) {
+                const item = {
+                    type: 'image',
+                    url: currentImageUrl,
+                    text: document.getElementById('voiceStatus').textContent,
+                    timestamp: new Date().toISOString()
+                };
+                
+                savedItems.push(item);
+                localStorage.setItem('aiStudioItems', JSON.stringify(savedItems));
+                alert('画像を保存しました！');
+            }
+        }
+
+        // Test function for debugging
+        function testImageGeneration(keyword = '花') {
+            console.log(`Testing image generation with: ${keyword}`);
+            generateImageFromText(keyword);
+        }
+
+        // Business Ideas
+        function fillSample(sample) {
+            document.getElementById('businessInput').value = sample;
+        }
+
+        function generateBusinessIdea() {
+            const input = document.getElementById('businessInput').value.trim();
+            if (!input) {
+                alert('まず何か入力してください');
+                return;
+            }
+
+            document.getElementById('businessLoading').style.display = 'block';
+            document.getElementById('ideaCard').style.display = 'none';
+
+            setTimeout(() => {
+                const idea = businessIdeas[input] || {
+                    title: `${input} کا کاروبار`,
+                    price: '100-1000 روپے',
+                    location: 'مقامی بازار',
+                    feature: 'منفرد پروڈکٹ، بہترین معیار',
+                    slogan: 'آپ کی پسند، ہماری ذمہ داری'
+                };
+
+                document.getElementById('ideaTitle').textContent = idea.title;
+                document.getElementById('ideaPrice').textContent = idea.price;
+                document.getElementById('ideaLocation').textContent = idea.location;
+                document.getElementById('ideaFeature').textContent = idea.feature;
+                document.getElementById('ideaSlogan').textContent = idea.slogan;
+
+                document.getElementById('businessLoading').style.display = 'none';
+                document.getElementById('ideaCard').style.display = 'block';
+            }, 2000);
+        }
+
+        function saveIdea() {
+            const title = document.getElementById('ideaTitle').textContent;
+            if (title) {
+                const item = {
+                    type: 'idea',
+                    title: title,
+                    price: document.getElementById('ideaPrice').textContent,
+                    location: document.getElementById('ideaLocation').textContent,
+                    feature: document.getElementById('ideaFeature').textContent,
+                    slogan: document.getElementById('ideaSlogan').textContent,
+                    timestamp: new Date().toISOString()
+                };
+                
+                savedItems.push(item);
+                localStorage.setItem('aiStudioItems', JSON.stringify(savedItems));
+                alert('アイデアを保存しました！');
+            }
+        }
+
+        // Gallery
+        function loadGallery() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            galleryGrid.innerHTML = '';
+            
+            if (savedItems.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            savedItems.reverse().forEach((item, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.onclick = () => openModal(item);
+                
+                if (item.type === 'image') {
+                    galleryItem.innerHTML = `
+                        <img src="${item.url}" alt="Generated Image">
+                        <div class="gallery-item-info">
+                            🎨 ${item.text.substring(0, 30)}...
+                        </div>
+                    `;
+                } else {
+                    galleryItem.innerHTML = `
+                        <div style="height: 120px; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                            💡
+                        </div>
+                        <div class="gallery-item-info">
+                            ${item.title}
+                        </div>
+                    `;
+                }
+                
+                galleryGrid.appendChild(galleryItem);
+            });
+        }
+
+        function openModal(item) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+            
+            if (item.type === 'image') {
+                modalContent.innerHTML = `
+                    <img src="${item.url}" style="max-width: 100%; border-radius: 10px;">
+                    <p style="margin-top: 15px; text-align: center;">${item.text}</p>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="deleteItem('${item.timestamp}')">\u524a\u9664\u3059\u308b</button>
+                    </div>
+                `;
+            } else {
+                modalContent.innerHTML = `
+                    <div class="idea-card" style="display: block; margin: 0;">
+                        <h3>${item.title}</h3>
+                        <div class="idea-detail"><strong>قیمت:</strong> ${item.price}</div>
+                        <div class="idea-detail"><strong>جگہ:</strong> ${item.location}</div>
+                        <div class="idea-detail"><strong>خصوصیت:</strong> ${item.feature}</div>
+                        <div class="idea-detail"><strong>نعرہ:</strong> ${item.slogan}</div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button class="btn btn-secondary" onclick="deleteItem('${item.timestamp}')">\u524a\u9664\u3059\u308b</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function deleteItem(timestamp) {
+            savedItems = savedItems.filter(item => item.timestamp !== timestamp);
+            localStorage.setItem('aiStudioItems', JSON.stringify(savedItems));
+            closeModal();
+            loadGallery();
+            alert('削除しました！');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
